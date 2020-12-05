@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DEV Debugger",
+      "type": "node",
+      "request": "launch",
+      "args": ["${workspaceRoot}/server.ts"],
+      "runtimeArgs": ["--nolazy", "-r", "ts-node/register"],
+      "sourceMaps": true,
+      "env": {
+        "NODE_ENV": "dev"
+      },
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector"
+    }
+  ]
+}

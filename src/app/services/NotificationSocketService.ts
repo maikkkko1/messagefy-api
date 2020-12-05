@@ -28,7 +28,7 @@ export default class NotificationSocketService {
     this.socketServer.on("connection", (socket) => {
       console.log("New connection");
 
-      this.onSubscribeDeviceToRoom(socket);
+      this.onSubscribeDeviceToRoom(socket, notificationService);
 
       this.onNewDeviceTokenRequested(socket, deviceService);
 
@@ -58,15 +58,21 @@ export default class NotificationSocketService {
     socket: any,
     notificationService: NotificationService
   ) {
-    socket.on(SocketEvents.REQUEST.CONFIRM_RECEIVED, async (notificationId: string) => {
+    socket.on(SocketEvents.REQUEST.CONFIRM_RECEIVED, async (notificationId: number) => {
       await notificationService.setReceived(notificationId);
     });
   }
 
   /** Subscribe the device in a room. */
-  static onSubscribeDeviceToRoom(socket: any) {
-    socket.on(SocketEvents.JOIN.NOTIFICATIONS, (deviceToken: string) => {
+  static onSubscribeDeviceToRoom(socket: any, notificationService: NotificationService) {
+    socket.on(SocketEvents.JOIN.NOTIFICATIONS, async (deviceToken: string) => {
       socket.join(deviceToken);
+
+      const unreceivedNotifications = await notificationService.getUnreceived(deviceToken)
+
+      for (let i = 0; i< unreceivedNotifications.length; i++) {
+        this.sendNewNotificationToRoom(deviceToken, unreceivedNotifications[i])
+      }
     });
   }
 

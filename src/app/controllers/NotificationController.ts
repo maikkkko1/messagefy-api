@@ -26,22 +26,25 @@ class NotificationController extends MainController implements IController {
       return this.responseInvalidData(res);
     }
 
-    for (let i = 0; i < tokenList.length; i++) {
-      const findDeviceToken = await this.deviceService.findByToken(tokenList[i]);
-
-      if (!findDeviceToken) {
-        return this.responseError(res, 404, `Token ${tokenList[i]} not found.`);
-      }
-    }
-
     try {
-      const notification = await this.controllerService.createNotification(body);
+      const errors: string[] = [];
 
-      for (let j = 0; j < tokenList.length; j++) {
-        NotificationSocketService.sendNewNotificationToRoom(tokenList[j], notification);
+      for (let i = 0; i < tokenList.length; i++) {
+        const device = await this.deviceService.findByToken(tokenList[i]);
+
+        if (!device) {
+          errors.push(`Token ${tokenList[i]} not found.`);
+        } else {
+          const notification = await this.controllerService.createNotification({
+            ...body,
+            ...{ deviceId: device.id, deviceToken: device.token },
+          });
+
+          NotificationSocketService.sendNewNotificationToRoom(device.token, notification);
+        }
       }
 
-      this.responseSuccess(res, true);
+      this.responseSuccess(res, { sent: true, errors: errors });
     } catch (err) {
       this.logError("SendNotification", err);
 

@@ -4,10 +4,11 @@ module.exports = {
   up: (queryInterface, DataTypes) => {
     return queryInterface.createTable("notification", {
       id: {
+        autoIncrement: true,
         allowNull: false,
         primaryKey: true,
         unique: true,
-        type: DataTypes.UUID,
+        type: DataTypes.INTEGER,
       },
       deviceToken: {
         allowNull: true,

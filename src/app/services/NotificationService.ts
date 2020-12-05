@@ -8,7 +8,13 @@ export default class NotificationService {
     return await db.model(notification).insert(data);
   };
 
-  setReceived = async (id: string) => {
+  setReceived = async (id: number) => {
     return await db.model(notification).update({ id: id }, { received: true });
+  };
+
+  getUnreceived = async (deviceToken: string) => {
+    return await db
+      .model(notification)
+      .selectAllWhere({ deviceToken: deviceToken, received: false });
   };
 }

@@ -1,5 +1,3 @@
-const { v4: uuidv4 } = require("uuid");
-
 module.exports = (sequelize, DataTypes) => {
   const Notification = sequelize.define(
     "notification",
@@ -12,8 +10,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     { freezeTableName: true }
   );
-
-  Notification.beforeCreate((v) => (v.id = uuidv4()));
 
   return Notification;
 };
